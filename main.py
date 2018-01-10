@@ -22,6 +22,21 @@ STATUS_MESSAGES = ['Winter is coming','HODOR?','Everything is better with some w
 
 friends = []
 
+#-----------FUNCTION TO SELECT FRIEND------------------------
+
+def select_friend():
+
+    friend_number = 0
+    for friend in friends:
+        print "%s aged %d with rating %.2f is online" %(friend['name'],friend['age'],friend['rating'])
+        friend_number = friend_number + 1
+
+    friend_choose = input("\nSelect a Friend")
+    friend_index = friend_choose - 1
+
+    return friend_index
+
+
 #--------------FUNCTION TO ADD STATUS--------------------------
 
 def add_status(current_status_message):
@@ -151,6 +166,8 @@ def start_chat(spy_name,spy_salutation,spy_age,spy_rating):
                         print  "%d.%s" %(friend_number,friend['name'])
                         friend_number = friend_number + 1
 
+            if choice == 3:
+                selected_friend = select_friend()
 
             if choice == 6:
 
