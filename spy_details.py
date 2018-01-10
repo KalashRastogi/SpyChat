@@ -1,5 +1,7 @@
-spy_name= "Jon Snow"
-spy_age = 32
-spy_salutation = "Mr."
-spy_rating = 4.0
-spy_is_online =  True
+spy = {
+    'name':'JON SNOW',
+    'salutation':'Mr.',
+    'age':35,
+    'rating':4.0,
+    'is_online':True
+}
