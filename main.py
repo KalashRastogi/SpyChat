@@ -40,21 +40,30 @@ def read_from_user():
 def send_message():
 
     friend_choice = select_friend()
+    temp = True
 
-    original_image = input("What is the name of the image?")
-    output_path = 'output.jpg'
-    text = raw_input("What do you want to say?")
-    Steganography.encode(original_image, output_path, text)
+    while(temp):
+        original_image = input("What is the name of the image?")
 
-    new_chat = {
-        'message': text,
-        'time': datetime.now(),
-        'sent_by_me': True
-    }
+        check_image = original_image.split('.')
 
-    friends[friend_choice]['chats'].append(new_chat)
+        if check_image[1] != "jpg":
+            print "Please Enter An image with jpg format!!"
+        else:
+            output_path = 'output.jpg'
+            text = raw_input("What do you want to say?")
+            Steganography.encode(original_image, output_path, text)
 
-    print "Your secret image is ready!"
+            new_chat = {
+                'message': text,
+                'time': datetime.now(),
+                'sent_by_me': True
+            }
+
+            friends[friend_choice]['chats'].append(new_chat)
+
+            print "Your secret image is ready!"
+            temp = False
 
 
 # ------------FUNCTION TO READ MESSAGE------------------------
