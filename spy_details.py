@@ -1,31 +1,31 @@
-spy = {
-    'name':'JON SNOW',
-    'salutation':'Mr.',
-    'age':35,
-    'rating':4.0,
-    'is_online':True
-}
+# IMPORTING DATE AND TIME PACKAGE
 
-friends = [
-    {
-        'name': 'Arya Stark',
-        'salutation': 'Miss',
-        'rating': 4.9,
-        'age': 13,
-        'chats': []
-    },
-    {
-        'name': 'Sansa Stark',
-        'salutation': 'Miss',
-        'rating': 4.5,
-        'age': 20,
-        'chats': []
-    },
-    {
-        'name': 'Daenerys Targerian',
-        'salutation': 'Mrs.',
-        'rating': 4.2,
-        'age': 29,
-        'chats': []
-    }
-]
+from datetime import datetime
+
+class Spy:
+
+    def __init__(self, name, salutation, age, rating):
+        self.name = name
+        self.salutation = salutation
+        self.age = age
+        self.rating = rating
+        self.is_online = True
+        self.chats = []
+        self.current_status_message = None
+
+class ChatMessage():
+    def __init__(self, hidden_text,  sent_by_me):
+        self.hidden_text = hidden_text
+        self.sent_by_me = sent_by_me
+        self.time = datetime.now()
+
+
+spy = Spy('JON SNOW', 'Mr.', 35, 4.0)
+
+
+friend_one = Spy('Arya Stark', 'Miss', 4.9, 13)
+friend_two = Spy('Sansa Stark', 'Miss', 4.5, 20)
+friend_three = Spy('Daenerys Targerian', 'Mrs.', 4.2, 29)
+
+# FRIENDS LIST
+friends = [friend_one, friend_two, friend_three]
