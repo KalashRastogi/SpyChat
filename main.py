@@ -1,6 +1,6 @@
 # --S--P--Y--C--H--A--T____P--R--O--J--E--C--T--
 
-# importing important pacjages and classes and lists
+# importing important packages and classes and lists
 
 from steganography.steganography import Steganography
 from spy_details import spy, friends
@@ -39,7 +39,8 @@ def read_from_user():
         print "\nNAME:%s\n" % colored(friends[friend_choice].name, 'red')
 
         for chat in friends[friend_choice].chats:
-            if chat.sent_by_me is True:
+            print chat.sent_by_me
+            if chat.sent_by_me == 'True':
                 print "Message:%s\nTime:%s\t\t(Sent Message)\n" % (chat.hidden_text, colored(chat.time, 'blue'))
             else:
                 print "Message:%s\nTime:%s\t\t(Recieved Message)\n" % (chat.hidden_text, colored(chat.time, 'blue'))
@@ -53,7 +54,7 @@ def send_message():
 
     while (temp):
 
-        original_image = input("What is the name of the image?")
+        original_image = raw_input("What is the name of the image?")
 
         check_image = original_image.split('.')
 
@@ -71,7 +72,7 @@ def send_message():
             friends[friend_choice].chats.append(new_chat)
             with open('chats.csv','a') as chat_data:
                 writer = csv.writer(chat_data)
-                writer.writerow([int(friend_choice), text,datetime.now(),sent_by_me])
+                writer.writerow([int(friend_choice), text, datetime.now(), sent_by_me])
 
             print "Message sent successfuly!!"
 
@@ -83,7 +84,7 @@ def send_message():
 def read_message():
     sender = select_friend()
 
-    output_path = input("What is the name of the file?")
+    output_path = raw_input("What is the name of the file?")
     secret_text = Steganography.decode(output_path)
     sent_by_me = False
 
@@ -96,7 +97,7 @@ def read_message():
         writer = csv.writer(chat_data)
         writer.writerow([int(sender), secret_text, datetime.now(), sent_by_me])
 
-    print "Your secret message hasb been saved!"
+    print "Your secret message has been saved!"
 
 
 # -------------------FUNCTION TO SELECT FRIEND----------------------------
@@ -127,44 +128,51 @@ def add_status(current_status_message):
     else:
         print "You don't have any status message currently \n"
 
-    default = raw_input("Do you want to select from the older status (y/n)?")
+    repeat1 = True
+    while (repeat1):
+        default = raw_input("Do you want to select from the older status (y/n)?")
 
-    if default.upper() == "N":
-        temp1 = True
-        while (temp1):
 
-            new_status_message = raw_input("What status message do you want to select?")
+        if default.upper() == "N":
+            temp1 = True
+            while (temp1):
 
-            if len(new_status_message) > 0:
-                updated_status_message = new_status_message
-                STATUS_MESSAGES.append(updated_status_message)
-                temp1 = False
+                new_status_message = raw_input("What status message do you want to select?")
 
-            else:
-                print "Type something!! Try Again!"
+                if len(new_status_message) > 0:
+                    updated_status_message = new_status_message
+                    STATUS_MESSAGES.append(updated_status_message)
+                    temp1 = False
 
-    elif default.upper() == "Y":
-        status_number = 1
+                else:
+                    print "Type something!! Try Again!"
 
-        for message in STATUS_MESSAGES:
-            print "%d.%s" % (status_number, message)
-            status_number = status_number + 1
+            repeat1 = False
 
-        temp1 = True
+        elif default.upper() == "Y":
+            status_number = 1
 
-        while (temp1):
-            message_selection = input("\nChoose from the above message ")
+            for message in STATUS_MESSAGES:
+                print "%d.%s" % (status_number, message)
+                status_number = status_number + 1
 
-            if len(STATUS_MESSAGES) >= message_selection:
-                updated_status_message = STATUS_MESSAGES[message_selection - 1]
-                print "Status Updated!!"
-                temp1 = False
+            temp1 = True
 
-            else:
-                print "Choose a valid option!"
+            while (temp1):
+                message_selection = input("\nChoose from the above message ")
 
-    else:
-        print "Plz! Input Y or N..."
+                if len(STATUS_MESSAGES) >= message_selection:
+                    updated_status_message = STATUS_MESSAGES[message_selection - 1]
+                    print "Status Updated!!"
+                    temp1 = False
+
+                else:
+                    print "Choose a valid option!"
+
+            repeat1 = False
+
+        else:
+            print "Plz! Input Y or N..."
 
     print "Status Message:%s\n" % updated_status_message
 
@@ -286,26 +294,59 @@ def start_chat(spy):
 print "Welcome!!to SPY CHAT"
 print "Let's get Started!"
 
-# asking user about if he wants to conitue with the same name and age as previously logged in
+i = 5
 
-question = "Do you want to continue as %s %s(Y/N)? " % (spy.salutation, spy.name)
-existing = raw_input(question)
+repeat2 = True
 
-if existing.upper() == 'Y':
-    load_friends()
-    load_chats()
-    start_chat(spy)
+while(repeat2):
+    pwd = raw_input("Enter Password to continue:")
+    with open('password.csv','rb') as password:
+        csvreader = csv.reader(password, delimiter=',')
 
-else:
-    spy = Spy('', '', 0, 0.0)
-    spy.name = raw_input("Welcome! to SpyChat You must tell me your name first:")
+        for row in csvreader:
+            temp = row[0]
 
-    # to check whether user enetered something or not
-    if len(spy.name) > 0:
-        spy.salutation = raw_input("What should we call you(Mr./Mrs./Miss)?")
-        spy.age = input("What's your Age:")
-        spy.rating = input("What is your Spy Rating:")
-        start_chat(spy)
+    if pwd == temp:
+
+        # asking user about if he wants to conitue with the same name and age as previously logged in
+
+        repeat = True
+
+        while(repeat):
+
+            question = "Do you want to continue as %s %s(Y/N)? " % (spy.salutation, spy.name)
+            existing = raw_input(question)
+
+            if existing.upper() == 'Y':
+                load_friends()
+                load_chats()
+                start_chat(spy)
+                repeat = False
+
+            elif existing.upper() == 'N':
+                spy = Spy('', '', 0, 0.0)
+                spy.name = raw_input("Welcome! to SpyChat You must tell me your name first:")
+
+                # to check whether user enetered something or not
+                if len(spy.name) > 0:
+                    spy.salutation = raw_input("What should we call you(Mr./Mrs./Miss)?")
+                    spy.age = input("What's your Age:")
+                    spy.rating = input("What is your Spy Rating:")
+                    start_chat(spy)
+
+                else:
+                    print("Sorry!! A Spy need to have a Valid Name.Try Again Please!!")
+                repeat = False
+
+            else:
+                print "*Type Either Y/y or N/n*"
 
     else:
-        print("Sorry!! A Spy need to have a Valid Name.Try Again Please!!")
+        i = i-1
+        print colored('Wrong Password!','red')
+        print "Try again %d attempts left\n" %i
+
+        if i == 0:
+            print colored('Access Denied!','red')
+            print "Closing the Application..."
+            repeat2 = False

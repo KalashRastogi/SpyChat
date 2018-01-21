@@ -1,10 +1,5 @@
-# IMPORTING DATE AND TIME PACKAGE
-
-from datetime import datetime
 
 class Spy:
-
-
     def __init__(self, name, salutation, age, rating):
 
         self.name = name
@@ -20,7 +15,6 @@ class ChatMessage():
         self.hidden_text = hidden_text
         self.sent_by_me = sent_by_me
         self.time = time
-
 
 spy = Spy('JON SNOW', 'Mr.', 35, 4.0)
 
