@@ -5,40 +5,53 @@
 from steganography.steganography import Steganography
 from spy_details import spy, friends
 from spy_details import Spy, ChatMessage
+from termcolor import colored
+from datetime import datetime
+import csv
 
 # -------------------STATUS MESSAGES LIST-----------------------------
 
 STATUS_MESSAGES = ['Winter is coming', 'HODOR?', 'Everything is better with some wine in belly', 'VALAR MORGHULIS!',
                    'You know nothing JON SNOW!!']
 
+
 # ___________________________FUNCTIONS___________________________________
 
+# --------------------FUNCTION TO LOAD CHATS----------------------------
+
+def load_chats():
+    with open('chats.csv', 'rb') as chat_data:
+        csvreader = csv.reader(chat_data, delimiter=',')
+
+        for row in csvreader:
+            chat = ChatMessage(hidden_text=row[1],time=row[2],sent_by_me=row[3])
+            friends[int(row[0])].chats.append(chat)
 
 # -------------FUNCTION TO READ MESSAGES FROM THE USER------------------
 
 def read_from_user():
-
     friend_choice = select_friend()
 
     if not friends[friend_choice].chats:
-
         print "No Chats Till NOW!!"
 
     else:
-        print "\n%s of Age %d and Rating %.2f and her Chats Record\n" %(friends[friend_choice].name, friends[friend_choice].age, friends[friend_choice].rating)
+        print "\nNAME:%s\n" % colored(friends[friend_choice].name, 'red')
 
         for chat in friends[friend_choice].chats:
+            if chat.sent_by_me is True:
+                print "Message:%s\nTime:%s\t\t(Sent Message)\n" % (chat.hidden_text, colored(chat.time, 'blue'))
+            else:
+                print "Message:%s\nTime:%s\t\t(Recieved Message)\n" % (chat.hidden_text, colored(chat.time, 'blue'))
 
-            print "Message:%s\t\tTime:%s" %(chat.hidden_text, chat.time)
 
 # -------------------FUNCTION TO SEND A MESSAGE------------------------
 
 def send_message():
-
     friend_choice = select_friend()
     temp = True
 
-    while(temp):
+    while (temp):
 
         original_image = input("What is the name of the image?")
 
@@ -53,9 +66,13 @@ def send_message():
 
             Steganography.encode(original_image, output_path, text)
             sent_by_me = True
-            new_chat = ChatMessage(text, sent_by_me)
+            new_chat = ChatMessage(text, datetime.now(), sent_by_me)
 
             friends[friend_choice].chats.append(new_chat)
+            with open('chats.csv','a') as chat_data:
+                writer = csv.writer(chat_data)
+                writer.writerow([int(friend_choice), text,datetime.now(),sent_by_me])
+
             print "Message sent successfuly!!"
 
             temp = False
@@ -64,7 +81,6 @@ def send_message():
 # ------------------FUNCTION TO READ MESSAGE----------------------------
 
 def read_message():
-
     sender = select_friend()
 
     output_path = input("What is the name of the file?")
@@ -73,8 +89,12 @@ def read_message():
 
     print secret_text
 
-    new_chat = ChatMessage(secret_text, sent_by_me)
+    new_chat = ChatMessage(secret_text,datetime.now(), sent_by_me)
     friends[sender].chats.append(new_chat)
+
+    with open('chats.csv', 'a') as chat_data:
+        writer = csv.writer(chat_data)
+        writer.writerow([int(sender), secret_text, datetime.now(), sent_by_me])
 
     print "Your secret message hasb been saved!"
 
@@ -99,7 +119,6 @@ def select_friend():
 # ---------------------FUNCTION TO ADD STATUS------------------------------
 
 def add_status(current_status_message):
-
     updated_status_message = None
 
     if current_status_message is not None:
@@ -152,20 +171,35 @@ def add_status(current_status_message):
     return updated_status_message
 
 
+# ----------------------FUNCTION TO LOAD FRIENDS---------------------
+
+def load_friends():
+    with open('friends.csv', 'rb') as friend_data:
+        csvreader = csv.reader(friend_data, delimiter=',')
+
+        for row in csvreader:
+            friend = Spy(name=row[0], salutation=row[1], age=int(row[2]), rating=float(row[3]))
+            friends.append(friend)
+
+
 # -----------------------FUNCTION TO ADD FRIEND-------------------------
 
 def add_friend():
-
-    friend = Spy('','',0,0.0)
+    friend = Spy('', '', 0, 0.0)
 
     friend.name = raw_input("Enter your friend's name:")
     friend.salutation = raw_input("Are they (Mr./Mrs./Miss):")
     friend.age = input("How old are they:")
     friend.rating = input("What are their Spy Rating:")
 
-    if len(friend.name) > 0 and friend.age > 12 and friend.age < 50 and friend.rating >=  spy.rating:
-        new_friend = Spy(friend.name, friend.age, friend.age, friend.rating)
+    if len(friend.name) > 0 and friend.age > 12 and friend.age < 50 and friend.rating >= spy.rating:
+        new_friend = Spy(friend.name, friend.salutation, friend.age, friend.rating)
         friends.append(new_friend)
+
+        with open('friends.csv', 'a') as friend_data:
+            writer = csv.writer(friend_data)
+            writer.writerow([friend.name, friend.salutation, int(friend.age), float(friend.rating), friend.is_online])
+
     else:
         print "Sorry! Invalid entry. We can't add spy with the details you provided"
 
@@ -193,8 +227,7 @@ def start_chat(spy):
         else:
             print "We can always use somebody to help in the office."
 
-        print "Authentication complete. Welcome %s Age: %d and Rating of: %.2f \nProud to have you onboard" % (
-        spy.name, spy.age, spy.rating)
+        print "Authentication complete. Welcome %s Age: %d and Rating of: %.2f \nProud to have you onboard" % (spy.name, spy.age, spy.rating)
 
         show_menu = True
 
@@ -240,12 +273,13 @@ def start_chat(spy):
                 show_menu = False
 
             else:
-                 print "Invalid Choice,TRY AGAIN!!"
+                print "Invalid Choice,TRY AGAIN!!"
 
 
 
     else:
         print "You are not of the correct age to be a SPY!!"
+
 
 # _______________MAIN PROJECT STARTS HERE!___________________
 
@@ -258,15 +292,15 @@ question = "Do you want to continue as %s %s(Y/N)? " % (spy.salutation, spy.name
 existing = raw_input(question)
 
 if existing.upper() == 'Y':
+    load_friends()
+    load_chats()
     start_chat(spy)
 
 else:
-
-    friends = []
-    spy = Spy('','',0,0.0)
+    spy = Spy('', '', 0, 0.0)
     spy.name = raw_input("Welcome! to SpyChat You must tell me your name first:")
 
-# to check whether user enetered something or not
+    # to check whether user enetered something or not
     if len(spy.name) > 0:
         spy.salutation = raw_input("What should we call you(Mr./Mrs./Miss)?")
         spy.age = input("What's your Age:")
