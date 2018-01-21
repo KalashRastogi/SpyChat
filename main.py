@@ -39,7 +39,6 @@ def read_from_user():
         print "\nNAME:%s\n" % colored(friends[friend_choice].name, 'red')
 
         for chat in friends[friend_choice].chats:
-            print chat.sent_by_me
             if chat.sent_by_me == 'True':
                 print "Message:%s\nTime:%s\t\t(Sent Message)\n" % (chat.hidden_text, colored(chat.time, 'blue'))
             else:
@@ -84,20 +83,32 @@ def send_message():
 def read_message():
     sender = select_friend()
 
-    output_path = raw_input("What is the name of the file?")
-    secret_text = Steganography.decode(output_path)
-    sent_by_me = False
+    temp = True
 
-    print secret_text
+    while temp:
+        output_path = raw_input("What is the name of the file?")
 
-    new_chat = ChatMessage(secret_text,datetime.now(), sent_by_me)
-    friends[sender].chats.append(new_chat)
+        check_image = output_path.split('.')
 
-    with open('chats.csv', 'a') as chat_data:
-        writer = csv.writer(chat_data)
-        writer.writerow([int(sender), secret_text, datetime.now(), sent_by_me])
+        if check_image[1] != "jpg":
+            print "Please enter an image with jpg format!!"
 
-    print "Your secret message has been saved!"
+        else:
+
+            secret_text = Steganography.decode(output_path)
+            sent_by_me = False
+
+            print secret_text
+
+            new_chat = ChatMessage(secret_text,datetime.now(), sent_by_me)
+            friends[sender].chats.append(new_chat)
+
+            with open('chats.csv', 'a') as chat_data:
+                writer = csv.writer(chat_data)
+                writer.writerow([int(sender), secret_text, datetime.now(), sent_by_me])
+
+            print "Your secret message has been saved!"
+            temp = False
 
 
 # -------------------FUNCTION TO SELECT FRIEND----------------------------
